@@ -1,0 +1,28 @@
+const express = require('express');
+const app = express();
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+
+passport.use(new LocalStrategy({
+  usernameField: 'username',
+  passwordField: 'password'
+}, (username, password, done) => {
+  // Check if username and password are valid
+  const user =_users.find({ username, password });
+  if (user) {
+    done(null, user);
+  } else {
+    done(null, false);
+  }
+}));
+
+app.post('/login', (req, res, next) => {
+  passport.authenticate('local', (err, user, info) => {
+    if (err) { return next(err); }
+    if (!user) { return res.status(401).json({ message: 'Invalid username or password' }); }
+    req.logIn(user, (err) => {
+      if (err) { return next(err); }
+      res.json({ message: 'Logged in successfully' });
+    });
+  })(req, res, next);
+}); 
